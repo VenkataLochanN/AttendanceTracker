@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#f38ba8</color>
+    <color name="green">#a6e3a1</color>
+    <color name="yellow">#f9e2af</color>
+    <color name="flamingo">#f2cdcd</color>
+    <color name="blue">#89b4fa</color>
+    <color name="crust">#11111b</color>
+    <color name="mantle">#181825</color>
+    <color name="base">#1e1e2e</color>
+    <color name="surface1">#45475a</color>
+</resources>

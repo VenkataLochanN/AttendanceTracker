@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/attendance_layout"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:background="@drawable/rounded_border"
+    android:backgroundTint="#313244"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/coursename"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Course"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="#cdd6f4"
+        app:layout_constraintEnd_toStartOf="@+id/numbertxt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/attendanceProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/circular_progress_background"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/custom_circular_progress_bar"
+        android:progressTint="@color/yellow"
+        app:layout_constraintBottom_toBottomOf="@+id/numbertxt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/skiptext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Skip Classes"
+        android:textColor="#a6e3a1"
+        app:layout_constraintStart_toStartOf="@+id/coursename"
+        app:layout_constraintTop_toBottomOf="@+id/coursename" />
+
+    <TextView
+        android:id="@+id/numbertxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="100/100"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#f9e2af"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/attendanceProgressBar"
+        app:layout_constraintEnd_toStartOf="@+id/attendanceProgressBar"
+        app:layout_constraintTop_toTopOf="@+id/attendanceProgressBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
