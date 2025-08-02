@@ -7,3 +7,6 @@ An android app for tracking your attendance.
 4. Click '-' to mark absence
 5. Long press Course to delete
 6. Peace
+
+# Downloads:
+https://github.com/VenkataLochanN/AttendanceTracker/releases
