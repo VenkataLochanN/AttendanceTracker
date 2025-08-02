@@ -9,4 +9,4 @@ An android app for tracking your attendance.
 6. Peace
 
 # Downloads:
-https://github.com/VenkataLochanN/AttendanceTracker/releases
+download from https://github.com/VenkataLochanN/AttendanceTracker/releases
