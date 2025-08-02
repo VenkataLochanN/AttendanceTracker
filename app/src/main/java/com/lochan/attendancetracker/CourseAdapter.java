@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 // Import ProgressBar
 import android.widget.ProgressBar;
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 public class CourseAdapter extends ArrayAdapter<String> {
 
     private Context mContext;
-    private ArrayList<String> mCourseNames;
+    public ArrayList<String> mCourseNames;
     private SharedPreferences mSharedPreferences;
     private static final String PREFS_NAME = "AttendancePrefs";
     private static final String KEY_ATTENDED_PREFIX = "attended_";
@@ -35,6 +37,7 @@ public class CourseAdapter extends ArrayAdapter<String> {
         mContext = context;
         mCourseNames = courseNames;
         mSharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        courseRepository = new CourseRepository(context);
     }
 
     @NonNull
@@ -48,7 +51,7 @@ public class CourseAdapter extends ArrayAdapter<String> {
             holder = new ViewHolder();
             holder.courseNameTextView = listItem.findViewById(R.id.coursename);
             holder.skiptxt = listItem.findViewById(R.id.skiptext);
-            holder.attendacelayout = listItem.findViewById(R.id.attendance_layout);
+            holder.attendancelayout = listItem.findViewById(R.id.attendance_layout);
             holder.numberTextView = listItem.findViewById(R.id.numbertxt);
             holder.progressBar = listItem.findViewById(R.id.attendanceProgressBar); // Find ProgressBar
             listItem.setTag(holder);
@@ -65,13 +68,13 @@ public class CourseAdapter extends ArrayAdapter<String> {
         updateAttendanceUI(holder, attended, total);
 
 
-        holder.attendacelayout.setOnClickListener(v -> {
+        holder.attendancelayout.setOnClickListener(v -> {
             // Pass the ViewHolder to update its views directly
             showUpdateAttendanceDialog(currentCourse, holder);
         });
 
         // Add LongClickListener for deletion to the course name TextView
-        holder.attendacelayout.setOnLongClickListener(view -> {
+        holder.attendancelayout.setOnLongClickListener(view -> {
             // Ensure position is still valid when long-clicked
             if (position < mCourseNames.size()) {
                 final String courseToDelete = mCourseNames.get(position);
@@ -80,13 +83,61 @@ public class CourseAdapter extends ArrayAdapter<String> {
             return true; // Consume the long click
         });
 
+        // --- Listeners for Increment/Decrement Buttons ---
+        holder.incbtn = listItem.findViewById(R.id.addbtn);
+        holder.decbtn = listItem.findViewById(R.id.delbtn);
+
+        if (holder.decbtn != null) {
+            holder.decbtn.setOnClickListener(v -> {
+                if (position < mCourseNames.size()) { // Ensure position is still valid
+                    int currentAttended = getAttendedClasses(currentCourse);
+                    int currentTotal = getTotalClasses(currentCourse); // Get total to avoid going below 0 or other logic
+                    if (currentAttended > 0) {
+                        currentTotal++;
+                        saveAttendance(currentCourse, currentAttended, currentTotal);
+                        updateAttendanceUI(holder, currentAttended, currentTotal);
+                        Toast.makeText(mContext, "Absent for " + currentCourse, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mContext, "Attended classes cannot be less than 0", Toast.LENGTH_SHORT).show();
+                    }
+                }                });
+        } else {
+            // Log an error or handle the case where the button is not found
+            Log.e("CourseAdapter", "Button not found in layout!");
+        }
+
+        holder.incbtn.setOnClickListener(v -> {
+            if (position < mCourseNames.size()) { // Ensure position is still valid
+                int currentAttended = getAttendedClasses(currentCourse);
+                int currentTotal = getTotalClasses(currentCourse);
+                if (currentTotal == 0 && currentAttended == 0) {
+                     currentTotal = 1;
+                     currentAttended++;
+                     saveAttendance(currentCourse, currentAttended, currentTotal);
+                     updateAttendanceUI(holder, currentAttended, currentTotal);
+                    Toast.makeText(mContext, "Present for " + currentCourse, Toast.LENGTH_SHORT).show();
+                } else if (currentAttended < currentTotal) {
+                    currentAttended++;
+                    currentTotal++;
+                    saveAttendance(currentCourse, currentAttended, currentTotal);
+                    updateAttendanceUI(holder, currentAttended, currentTotal);
+                    Toast.makeText(mContext, "Present for " + currentCourse, Toast.LENGTH_SHORT).show();
+                } else if (currentAttended >= currentTotal && currentTotal > 0) {
+                    Toast.makeText(mContext, "Attended classes cannot exceed total classes (" + currentTotal + ")", Toast.LENGTH_SHORT).show();
+                } else { // total is 0, but attended might be > 0 (data inconsistency) or user trying to increment
+                    Toast.makeText(mContext, "Please set up by tapping on the item.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         return listItem;
     }
 
     // ViewHolder class for better performance
     private static class ViewHolder {
-        public View attendacelayout;
+        public View attendancelayout;
+        Button decbtn;
+        Button incbtn;
         TextView skiptxt;
         TextView courseNameTextView;
         TextView numberTextView;
@@ -119,22 +170,25 @@ public class CourseAdapter extends ArrayAdapter<String> {
             if(doubleValue >= 80){
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(green));
                 holder.numberTextView.setTextColor(green);
-            }else if(doubleValue <= 70){
+            } else if(doubleValue <= 70){
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(red));
                 holder.numberTextView.setTextColor(red);
+            } else if (doubleValue > 70 && doubleValue < 80) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(yellow));
+                holder.numberTextView.setTextColor(yellow);
             }
 
-            int needclass = (int) (0.75 * total);
-            int skipclass = attended - needclass;
+            double skipclass = ((100 * (double) attended) - (75 * (double) total)) / 75;
+            double needclass = ((100 * (double) attended) - (75 * (double) total)) / 25;
 
-            if(skipclass > 0){
-                holder.skiptxt.setText("Great! You can skip " + skipclass + " session(s)");
+            if(doubleValue > 75 && Math.floor(skipclass) > 0){
+                holder.skiptxt.setText("Great! You can skip " + Math.floor(skipclass) + " session(s)");
                 holder.skiptxt.setTextColor(green);
-            }else if (skipclass == 0){
+            } else if (doubleValue >= 75 && Math.floor(skipclass) <= 0){
                 holder.skiptxt.setText("You are on track, do not skip!");
                 holder.skiptxt.setTextColor(yellow);
-            } else if (skipclass < 0){
-                holder.skiptxt.setText("You need to attend " + Math.abs(skipclass) + " session(s) to cover");
+            } else if (doubleValue < 75) {
+                holder.skiptxt.setText("You need to attend " + Math.ceil(Math.abs(needclass)) + " session(s) to cover");
                 holder.skiptxt.setTextColor(red);
             }
         } else {
@@ -233,15 +287,15 @@ public class CourseAdapter extends ArrayAdapter<String> {
         alertDialog2.getWindow().setBackgroundDrawableResource(R.drawable.rounded_border);
         alertDialog2.show();
 
-        alertDialog2.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mantle);
-        alertDialog2.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(surface1);
+        alertDialog2.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(mantle);
+        alertDialog2.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(surface1);
     }
 
     // New method to handle actual removal from data source and SharedPreferences
     private void removeCourseAndData(String courseName, int position) {
         if (position < mCourseNames.size() && mCourseNames.get(position).equals(courseName)) {
             // 1. Remove from the adapter's list
-            mCourseNames.remove(position);
+            mCourseNames.remove(courseName);
 
             // 2. Notify the adapter that the data set has changed
             notifyDataSetChanged(); // This will refresh the ListView

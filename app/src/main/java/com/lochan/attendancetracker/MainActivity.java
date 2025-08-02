@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -75,15 +76,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAddCourseDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder3 = new AlertDialog.Builder(this, R.style.myDialogTheme3);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_add_course, null);
-        builder.setView(dialogView);
+        builder3.setView(dialogView);
 
         final EditText editTextCourseName = dialogView.findViewById(R.id.editTextCourseName);
-        builder.setTitle("Add New Course");
+        builder3.setTitle("Add New Course");
 
-        builder.setPositiveButton("Add", (dialog, which) -> {
+        builder3.setPositiveButton("Add", (dialog, which) -> {
             String courseName = editTextCourseName.getText().toString().trim();
             if (!courseName.isEmpty()) {
                 if (!dataList.contains(courseName)) {
@@ -98,9 +99,18 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Course name cannot be empty", Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        builder3.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        int mantle = ContextCompat.getColor(this, R.color.mantle);
+        int surface1 = ContextCompat.getColor(this, R.color.surface1);
+
+
+        AlertDialog alertDialog3 = builder3.create();
+        alertDialog3.getWindow().setBackgroundDrawableResource(R.drawable.rounded_border);
+        alertDialog3.show();
+
+        alertDialog3.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(mantle);
+        alertDialog3.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(surface1);
     }
 
     private void removeCourse(String courseName) {

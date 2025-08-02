@@ -1,7 +1,27 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.AttendanceTracker" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.AttendanceTracker" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
+
+    <style name="myDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/blue</item>
+        <item name="android:textColorPrimary">@color/mantle</item>
+        <item name="colorAccent">@color/mantle</item>
+    </style>
+
+    <style name="myDialogTheme2" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/red</item>
+        <item name="android:textColorPrimary">@color/mantle</item>
+        <item name="colorAccent">@color/mantle</item>
+    </style>
+    <style name="myDialogTheme3" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/green</item>
+        <item name="android:textColorPrimary">@color/mantle</item>
+        <item name="colorAccent">@color/mantle</item>
+    </style>
+
+    <style name="Theme.AttendanceTracker" parent="Base.Theme.AttendanceTracker" />
 </resources>
